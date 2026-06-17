@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+
+$text = stream_get_contents(STDIN);
+$needle = getenv('PRIVACY_FILTER_FAKE_NEEDLE') ?: 'jdoe@example.com';
+$type = getenv('PRIVACY_FILTER_FAKE_TYPE') ?: 'email';
+$mode = getenv('PRIVACY_FILTER_FAKE_MODE') ?: 'json';
+$start = strpos($text, $needle);
+
+if (($argv[1] ?? null) !== '--classify') {
+    fwrite(STDERR, 'Expected --classify.');
+
+    exit(1);
+}
+
+if ($start === false) {
+    echo "[]\n";
+
+    exit(0);
+}
+
+$entity = [
+    'entity_group' => $type,
+    'start' => $start,
+    'end' => $start + strlen($needle),
+    'score' => 0.9876,
+    'text' => $needle,
+];
+
+if ($mode === 'raw-text') {
+    printf(
+        "[\n {\"entity_group\": \"%s\", \"start\": %d, \"end\": %d, \"score\": %.4f, \"text\": \"%s\"}\n]\n",
+        $entity['entity_group'],
+        $entity['start'],
+        $entity['end'],
+        $entity['score'],
+        $entity['text'],
+    );
+
+    exit(0);
+}
+
+echo json_encode([$entity], JSON_PRETTY_PRINT).PHP_EOL;
