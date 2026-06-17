@@ -1,6 +1,10 @@
-# Privacy Filter
-
-Laravel wrapper for installing and using the compiled `privacy-filter.cpp` binaries.
+<div align="center">
+<h1>Privacy Filter</h1>
+<p>
+<a href="https://github.com/DirectoryTree/PrivacyFilter/actions/workflows/run-tests.yml"><img src="https://github.com/DirectoryTree/PrivacyFilter/actions/workflows/run-tests.yml/badge.svg?branch=master" alt="Tests status"></a>
+</p>
+<p>Laravel wrapper for installing and using the compiled <code>privacy-filter.cpp</code> binaries.</p>
+</div>
 
 ## Installation
 
