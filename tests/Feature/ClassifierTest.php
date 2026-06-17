@@ -7,39 +7,7 @@ use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter as PrivacyFilterFacade;
 use DirectoryTree\PrivacyFilter\Classifier;
 
 beforeEach(function () {
-    putenv('PRIVACY_FILTER_FAKE_MODE');
-    putenv('PRIVACY_FILTER_FAKE_NEEDLE');
-    putenv('PRIVACY_FILTER_FAKE_TYPE');
-
-    $this->binaryPath = realpath(__DIR__.'/../Fixtures/privacy-filter');
-    $this->modelPath = sys_get_temp_dir().'/privacy-filter-test-model.gguf';
-
-    chmod($this->binaryPath, 0755);
-    file_put_contents($this->modelPath, 'model');
-
-    config()->set('privacy-filter.paths.binary', $this->binaryPath);
-    config()->set('privacy-filter.paths.model', $this->modelPath);
-    config()->set('privacy-filter.model.threshold', 0.5);
-    config()->set('privacy-filter.process.timeout', 5);
-
-    $this->app->forgetInstance(Classifier::class);
-});
-
-afterEach(function () {
-    putenv('PRIVACY_FILTER_FAKE_MODE');
-    putenv('PRIVACY_FILTER_FAKE_NEEDLE');
-    putenv('PRIVACY_FILTER_FAKE_TYPE');
-
-    unset(
-        $_ENV['PRIVACY_FILTER_FAKE_MODE'],
-        $_ENV['PRIVACY_FILTER_FAKE_NEEDLE'],
-        $_ENV['PRIVACY_FILTER_FAKE_TYPE'],
-        $_SERVER['PRIVACY_FILTER_FAKE_MODE'],
-        $_SERVER['PRIVACY_FILTER_FAKE_NEEDLE'],
-        $_SERVER['PRIVACY_FILTER_FAKE_TYPE'],
-    );
-
-    @unlink($this->modelPath);
+    $this->useFakePrivacyFilter();
 });
 
 it('returns entity instances from the privacy filter output', function () {
@@ -67,15 +35,11 @@ it('can be called through the facade', function () {
 });
 
 it('uses byte offsets to hydrate text when the cli text field is not valid json', function () {
-    foreach ([
+    $this->setFakePrivacyFilterEnvironment([
         'PRIVACY_FILTER_FAKE_MODE' => 'raw-text',
         'PRIVACY_FILTER_FAKE_NEEDLE' => 'John "JD" Doe',
         'PRIVACY_FILTER_FAKE_TYPE' => 'person',
-    ] as $key => $value) {
-        putenv("{$key}={$value}");
-        $_ENV[$key] = $value;
-        $_SERVER[$key] = $value;
-    }
+    ]);
 
     $entities = app(Classifier::class)->entities('Contact John "JD" Doe today.');
 

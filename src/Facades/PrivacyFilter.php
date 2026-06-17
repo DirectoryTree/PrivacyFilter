@@ -2,6 +2,7 @@
 
 namespace DirectoryTree\PrivacyFilter\Facades;
 
+use DirectoryTree\PrivacyFilter\Classifier;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -16,6 +17,6 @@ class PrivacyFilter extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return \DirectoryTree\PrivacyFilter\Classifier::class;
+        return Classifier::class;
     }
 }
