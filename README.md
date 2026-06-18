@@ -143,11 +143,3 @@ if ($entity->type() === EntityType::PrivateEmail) {
 ```
 
 If the binary returns an entity type that is not known by this package, the `type` method will return `null`.
-
-## Testing
-
-You may run the package test suite using Pest:
-
-```bash
-./vendor/bin/pest
-```
