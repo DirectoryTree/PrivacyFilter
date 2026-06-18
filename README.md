@@ -90,7 +90,7 @@ php artisan privacy-filter:install-model --url=https://example.com/privacy-filte
 
 ## Usage
 
-You may classify text using the `PrivacyFilter` facade. The `entities` method returns an array of `DirectoryTree\PrivacyFilter\Entity` instances:
+You may classify text using the `PrivacyFilter` facade. The `entities` method returns an array of `Entity` instances:
 
 ```php
 use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter;
