@@ -97,12 +97,13 @@ use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter;
 
 $entities = PrivacyFilter::entities('Contact John Doe at jdoe@example.com.');
 
+/** @var \DirectoryTree\PrivacyFilter\Entity $entity */
 foreach ($entities as $entity) {
-    $entity->type;
-    $entity->text;
-    $entity->start;
-    $entity->end;
-    $entity->score;
+    $entity->type;  // private_email
+    $entity->text;  // jdoe@example.com
+    $entity->start; // 20
+    $entity->end;   // 36
+    $entity->score; // 0.98
 }
 ```
 
