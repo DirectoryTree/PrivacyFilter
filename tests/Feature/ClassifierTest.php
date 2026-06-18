@@ -1,7 +1,7 @@
 <?php
 
 use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter as PrivacyFilterFacade;
-use DirectoryTree\PrivacyFilterClassifier\Classifier;
+use DirectoryTree\PrivacyFilterClassifier\ClassifierInterface;
 use DirectoryTree\PrivacyFilterClassifier\Entity;
 use DirectoryTree\PrivacyFilterClassifier\Exceptions\BinaryNotFoundException;
 use DirectoryTree\PrivacyFilterClassifier\Exceptions\ModelNotFoundException;
@@ -11,7 +11,7 @@ beforeEach(function () {
 });
 
 it('returns entity instances from the privacy filter output', function () {
-    $entities = app(Classifier::class)->entities(
+    $entities = app(ClassifierInterface::class)->entities(
         'Contact John Doe at jdoe@example.com from 555-0100.',
     );
 
@@ -41,7 +41,7 @@ it('uses byte offsets to hydrate text when the cli text field is not valid json'
         'PRIVACY_FILTER_FAKE_TYPE' => 'person',
     ]);
 
-    $entities = app(Classifier::class)->entities('Contact John "JD" Doe today.');
+    $entities = app(ClassifierInterface::class)->entities('Contact John "JD" Doe today.');
 
     expect($entities)->toHaveCount(1)
         ->and($entities[0]->type)->toBe('person')
@@ -51,15 +51,15 @@ it('uses byte offsets to hydrate text when the cli text field is not valid json'
 it('throws an exception when the binary does not exist', function () {
     config()->set('privacy-filter.paths.binary', __DIR__.'/missing-privacy-filter');
 
-    $this->app->forgetInstance(Classifier::class);
+    $this->app->forgetInstance(ClassifierInterface::class);
 
-    app(Classifier::class)->entities('Contact John Doe at jdoe@example.com.');
+    app(ClassifierInterface::class)->entities('Contact John Doe at jdoe@example.com.');
 })->throws(BinaryNotFoundException::class);
 
 it('throws an exception when the model does not exist', function () {
     config()->set('privacy-filter.paths.model', __DIR__.'/missing-model.gguf');
 
-    $this->app->forgetInstance(Classifier::class);
+    $this->app->forgetInstance(ClassifierInterface::class);
 
-    app(Classifier::class)->entities('Contact John Doe at jdoe@example.com.');
+    app(ClassifierInterface::class)->entities('Contact John Doe at jdoe@example.com.');
 })->throws(ModelNotFoundException::class);
