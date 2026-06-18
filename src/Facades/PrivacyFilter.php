@@ -3,10 +3,11 @@
 namespace DirectoryTree\PrivacyFilter\Facades;
 
 use DirectoryTree\PrivacyFilterClassifier\Classifier;
+use DirectoryTree\PrivacyFilterClassifier\Entity;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static array<int, \DirectoryTree\PrivacyFilterClassifier\Entity> entities(string $text, ?float $threshold = null)
+ * @method static array<int, Entity> entities(string $text, ?float $threshold = null)
  *
  * @see Classifier
  */

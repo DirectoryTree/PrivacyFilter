@@ -4,8 +4,11 @@ namespace DirectoryTree\PrivacyFilter\Tests;
 
 use DirectoryTree\PrivacyFilter\PrivacyFilterServiceProvider;
 use DirectoryTree\PrivacyFilterClassifier\Classifier;
+use FilesystemIterator;
 use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as Orchestra;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -166,9 +169,9 @@ abstract class TestCase extends Orchestra
             return;
         }
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST,
         );
 
         foreach ($iterator as $file) {
