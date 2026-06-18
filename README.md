@@ -143,3 +143,38 @@ if ($entity->type() === EntityType::PrivateEmail) {
 ```
 
 If the binary returns an entity type that is not known by this package, the `type` method will return `null`.
+
+## Testing
+
+You may use the `fake` method to prevent the package from invoking the installed binary during tests. The fake method accepts a list of entities that should be returned for every classification:
+
+```php
+use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter;
+use DirectoryTree\PrivacyFilterClassifier\Entity;
+
+PrivacyFilter::fake([
+    new Entity(
+        type: 'private_email',
+        start: 20,
+        end: 36,
+        score: 0.98,
+        text: 'jdoe@example.com',
+    ),
+]);
+```
+
+You may also fake responses for specific text using exact strings or wildcard patterns:
+
+```php
+PrivacyFilter::fake([
+    '*jdoe@example.com*' => [
+        new Entity(
+            type: 'private_email',
+            start: 20,
+            end: 36,
+            score: 0.98,
+            text: 'jdoe@example.com',
+        ),
+    ],
+]);
+```
