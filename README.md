@@ -3,7 +3,7 @@
 <p>
 <a href="https://github.com/DirectoryTree/PrivacyFilter/actions/workflows/run-tests.yml"><img src="https://github.com/DirectoryTree/PrivacyFilter/actions/workflows/run-tests.yml/badge.svg?branch=master" alt="Tests status"></a>
 </p>
-<p>Laravel wrapper for installing and using the compiled <code>privacy-filter.cpp</code> binaries.</p>
+<p>Laravel wrapper for installing and using the compiled <a href="https://github.com/localai-org/privacy-filter.cpp"><code>privacy-filter.cpp</code></a> binaries.</p>
 </div>
 
 ## Installation
