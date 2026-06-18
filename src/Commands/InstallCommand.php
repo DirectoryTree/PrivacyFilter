@@ -15,6 +15,8 @@ class InstallCommand extends Command
      * @var string
      */
     protected $signature = 'privacy-filter:install
+        {--binary-url= : Binary archive URL to install}
+        {--model-url= : GGUF model URL to install}
         {--force : Overwrite existing binary and model files}';
 
     /**
@@ -32,6 +34,7 @@ class InstallCommand extends Command
         $force = (bool) $this->option('force');
 
         $binaryExitCode = $this->call('privacy-filter:install-binary', [
+            '--url' => $this->option('binary-url'),
             '--force' => $force,
         ]);
 
@@ -40,6 +43,7 @@ class InstallCommand extends Command
         }
 
         return $this->call('privacy-filter:install-model', [
+            '--url' => $this->option('model-url'),
             '--force' => $force,
         ]);
     }
