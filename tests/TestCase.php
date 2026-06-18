@@ -4,6 +4,7 @@ namespace DirectoryTree\PrivacyFilter\Tests;
 
 use DirectoryTree\PrivacyFilter\PrivacyFilterServiceProvider;
 use DirectoryTree\PrivacyFilterClassifier\Classifier;
+use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as Orchestra;
 use RuntimeException;
 use Symfony\Component\Process\Process;
@@ -33,7 +34,7 @@ abstract class TestCase extends Orchestra
     /**
      * Get package service providers.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      * @return array<int, class-string>
      */
     protected function getPackageProviders($app): array

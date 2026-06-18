@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static array<int, \DirectoryTree\PrivacyFilterClassifier\Entity> entities(string $text, ?float $threshold = null)
  *
- * @see \DirectoryTree\PrivacyFilterClassifier\Classifier
+ * @see Classifier
  */
 class PrivacyFilter extends Facade
 {
