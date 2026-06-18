@@ -104,9 +104,7 @@ class InstallBinaryCommand extends Command
      */
     protected function install(string $workingDirectory, string $binaryPath): void
     {
-        $source = $this->findExtractedBinary($workingDirectory);
-
-        if (is_null($source)) {
+        if (! $source = $this->findExtractedBinary($workingDirectory)) {
             throw new RuntimeException('Unable to locate the privacy-filter binary in the extracted archive.');
         }
 
@@ -168,7 +166,7 @@ class InstallBinaryCommand extends Command
     {
         $path = parse_url($url, PHP_URL_PATH);
 
-        if (! is_string($path) || $path === '') {
+        if (! is_string($path) || empty($path)) {
             return $fallback;
         }
 

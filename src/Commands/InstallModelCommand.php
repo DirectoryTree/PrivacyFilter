@@ -44,13 +44,7 @@ class InstallModelCommand extends Command
             return self::SUCCESS;
         }
 
-        try {
-            $this->download($url, $modelPath);
-        } catch (RuntimeException $exception) {
-            $this->error($exception->getMessage());
-
-            return self::FAILURE;
-        }
+        $this->download($url, $modelPath);
 
         $this->info('Privacy-filter model installed.');
 
