@@ -5,7 +5,8 @@ namespace DirectoryTree\PrivacyFilter\Tests;
 use DirectoryTree\PrivacyFilter\Classifier;
 use DirectoryTree\PrivacyFilter\PrivacyFilterServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use PharData;
+use RuntimeException;
+use Symfony\Component\Process\Process;
 
 /**
  * Base test case for package feature tests.
@@ -57,7 +58,6 @@ abstract class TestCase extends Orchestra
 
         config()->set('privacy-filter.paths.binary', $this->fakePrivacyFilterBinaryPath);
         config()->set('privacy-filter.paths.model', $this->fakePrivacyFilterModelPath);
-        config()->set('privacy-filter.model.threshold', 0.5);
         config()->set('privacy-filter.process.timeout', 5);
 
         $this->app->forgetInstance(Classifier::class);
@@ -115,20 +115,26 @@ abstract class TestCase extends Orchestra
         $directory = $this->makeTemporaryDirectory();
         $root = $directory.DIRECTORY_SEPARATOR.'privacy-filter-test';
         $bin = $root.DIRECTORY_SEPARATOR.'bin';
+        $lib = $root.DIRECTORY_SEPARATOR.'lib';
         $binary = $bin.DIRECTORY_SEPARATOR.'privacy-filter';
-        $tar = $directory.DIRECTORY_SEPARATOR.'privacy-filter-test.tar';
+        $archive = $directory.DIRECTORY_SEPARATOR.'privacy-filter-test.tar.gz';
 
         mkdir($bin, 0755, true);
+        mkdir($lib, 0755, true);
         file_put_contents($binary, "#!/usr/bin/env sh\nprintf 'privacy-filter test binary'\n");
+        file_put_contents($lib.DIRECTORY_SEPARATOR.'libggml.0.15.1.dylib', 'privacy-filter test library');
+        symlink('libggml.0.15.1.dylib', $lib.DIRECTORY_SEPARATOR.'libggml.0.dylib');
+        symlink('libggml.0.dylib', $lib.DIRECTORY_SEPARATOR.'libggml.dylib');
         chmod($binary, 0755);
 
-        $archive = new PharData($tar);
-        $archive->buildFromDirectory($root);
-        $archive->compress(\Phar::GZ);
+        $process = new Process(['tar', '-czf', $archive, '-C', $directory, 'privacy-filter-test']);
+        $process->run();
 
-        unlink($tar);
+        if (! $process->isSuccessful()) {
+            throw new RuntimeException('Unable to create privacy-filter test archive.');
+        }
 
-        return $tar.'.gz';
+        return $archive;
     }
 
     /**

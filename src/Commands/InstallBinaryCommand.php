@@ -4,6 +4,7 @@ namespace DirectoryTree\PrivacyFilter\Commands;
 
 use FilesystemIterator;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use PharData;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -42,8 +43,8 @@ class InstallBinaryCommand extends Command
             $repository = config('privacy-filter.release.repository');
             $release = $this->option('release') ?: config('privacy-filter.release.version');
             $binaryPath = config('privacy-filter.paths.binary');
-            $asset = $this->assetName();
-            $url = $this->option('url') ?: $this->releaseUrl($repository, $release, $asset);
+            $asset = $this->getAssetName();
+            $url = $this->option('url') ?: $this->getReleaseUrl($repository, $release, $asset);
         } catch (RuntimeException $exception) {
             $this->error($exception->getMessage());
 
@@ -53,7 +54,7 @@ class InstallBinaryCommand extends Command
         $this->info('Installing privacy-filter binary.');
         $this->line("Target: {$binaryPath}");
 
-        if (file_exists($binaryPath) && ! $this->option('force')) {
+        if (File::exists($binaryPath) && ! $this->option('force')) {
             $this->warn('The privacy-filter binary already exists. Use --force to overwrite it.');
 
             return self::SUCCESS;
@@ -62,8 +63,9 @@ class InstallBinaryCommand extends Command
         $workingDirectory = null;
 
         try {
-            $workingDirectory = $this->makeWorkingDirectory();
-            $archivePath = $workingDirectory.DIRECTORY_SEPARATOR.$this->archiveFileName($url, $asset);
+            $workingDirectory = $this->getWorkingDirectory();
+
+            $archivePath = $workingDirectory.DIRECTORY_SEPARATOR.$this->getArchiveFileName($url, $asset);
 
             $this->download($url, $archivePath);
             $this->extract($archivePath, $workingDirectory);
@@ -86,7 +88,7 @@ class InstallBinaryCommand extends Command
     /**
      * Get the release asset name for the host platform.
      */
-    protected function assetName(): string
+    protected function getAssetName(): string
     {
         return match (PHP_OS_FAMILY) {
             'Darwin' => php_uname('m') === 'arm64'
@@ -101,7 +103,7 @@ class InstallBinaryCommand extends Command
     /**
      * Build the GitHub release download URL for the selected asset.
      */
-    protected function releaseUrl(string $repository, string $release, string $asset): string
+    protected function getReleaseUrl(string $repository, string $release, string $asset): string
     {
         return "https://github.com/{$repository}/releases/download/{$release}/{$asset}";
     }
@@ -109,7 +111,7 @@ class InstallBinaryCommand extends Command
     /**
      * Resolve the local archive filename.
      */
-    protected function archiveFileName(string $url, string $fallback): string
+    protected function getArchiveFileName(string $url, string $fallback): string
     {
         $path = parse_url($url, PHP_URL_PATH);
 
@@ -123,13 +125,11 @@ class InstallBinaryCommand extends Command
     /**
      * Create a temporary working directory.
      */
-    protected function makeWorkingDirectory(): string
+    protected function getWorkingDirectory(): string
     {
         $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'privacy-filter-'.bin2hex(random_bytes(8));
 
-        if (! mkdir($path, 0755, true) && ! is_dir($path)) {
-            throw new RuntimeException("Unable to create temporary directory [{$path}].");
-        }
+        File::ensureDirectoryExists($path);
 
         return $path;
     }
@@ -139,7 +139,7 @@ class InstallBinaryCommand extends Command
      */
     protected function download(string $url, string $target): void
     {
-        (new FileDownloader($this->output))->download($url, $target, 'binary archive');
+        FileDownloader::make($this->output)->download($url, $target, 'binary archive');
     }
 
     /**
@@ -185,43 +185,37 @@ class InstallBinaryCommand extends Command
      */
     protected function extractTarGz(string $archivePath, string $workingDirectory): void
     {
+        if (PHP_OS_FAMILY !== 'Windows' && $this->extractWithTar($archivePath, $workingDirectory)) {
+            return;
+        }
+
         try {
             $phar = new PharData($archivePath);
             $tarPath = substr($archivePath, 0, -3);
 
-            if (! file_exists($tarPath)) {
+            if (! File::exists($tarPath)) {
                 $phar->decompress();
             }
 
             (new PharData($tarPath))->extractTo($workingDirectory, null, true);
         } catch (\Exception $exception) {
-            $this->extractWithTar($archivePath, $workingDirectory, $exception);
+            throw new RuntimeException("Unable to extract tar archive [{$archivePath}].", 0, $exception);
         }
     }
 
     /**
      * Extract a gzipped tar archive with the system tar command.
      */
-    protected function extractWithTar(string $archivePath, string $workingDirectory, \Throwable $previous): void
+    protected function extractWithTar(string $archivePath, string $workingDirectory): bool
     {
-        if (PHP_OS_FAMILY === 'Windows') {
-            throw new RuntimeException("Unable to extract tar archive [{$archivePath}].", 0, $previous);
-        }
-
         $process = new Process(['tar', '-xzf', $archivePath, '-C', $workingDirectory]);
         $process->run();
 
-        if (! $process->isSuccessful()) {
-            throw new RuntimeException(
-                trim($process->getErrorOutput()) ?: "Unable to extract tar archive [{$archivePath}].",
-                0,
-                $previous,
-            );
-        }
+        return $process->isSuccessful();
     }
 
     /**
-     * Move the extracted binary into the configured location.
+     * Move the extracted package into the configured location.
      */
     protected function installBinary(string $workingDirectory, string $binaryPath): void
     {
@@ -231,17 +225,67 @@ class InstallBinaryCommand extends Command
             throw new RuntimeException('Unable to locate the privacy-filter binary in the extracted archive.');
         }
 
+        $packageDirectory = dirname(dirname($source));
+        $installDirectory = $this->installDirectory($binaryPath);
+
+        $this->copyDirectory($packageDirectory, $installDirectory);
+
+        File::chmod($binaryPath, 0755);
+    }
+
+    /**
+     * Resolve the package installation directory from the configured binary path.
+     */
+    protected function installDirectory(string $binaryPath): string
+    {
         $directory = dirname($binaryPath);
 
-        if (! is_dir($directory) && ! mkdir($directory, 0755, true) && ! is_dir($directory)) {
-            throw new RuntimeException("Unable to create binary directory [{$directory}].");
-        }
+        return basename($directory) === 'bin' ? dirname($directory) : $directory;
+    }
 
-        if (! copy($source, $binaryPath)) {
-            throw new RuntimeException("Unable to install privacy-filter binary to [{$binaryPath}].");
-        }
+    /**
+     * Copy a directory and all of its contents.
+     */
+    protected function copyDirectory(string $source, string $destination): void
+    {
+        File::ensureDirectoryExists($destination);
 
-        @chmod($binaryPath, 0755);
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($source, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST,
+        );
+
+        foreach ($iterator as $file) {
+            $target = $destination.DIRECTORY_SEPARATOR.$iterator->getSubPathName();
+
+            if ($file->isLink()) {
+                if (File::exists($target) || is_link($target)) {
+                    File::delete($target);
+                }
+
+                if (! symlink(readlink($file->getPathname()), $target)) {
+                    throw new RuntimeException("Unable to create symlink [{$target}].");
+                }
+
+                continue;
+            }
+
+            if ($file->isDir()) {
+                File::ensureDirectoryExists($target);
+
+                continue;
+            }
+
+            if (File::exists($target) || is_link($target)) {
+                File::delete($target);
+            }
+
+            if (! File::copy($file->getPathname(), $target)) {
+                throw new RuntimeException("Unable to copy file [{$file->getPathname()}] to [{$target}].");
+            }
+
+            File::chmod($target, $file->getPerms() & 0777);
+        }
     }
 
     /**
@@ -266,19 +310,10 @@ class InstallBinaryCommand extends Command
      */
     protected function deleteDirectory(string $directory): void
     {
-        if (! is_dir($directory)) {
+        if (! File::isDirectory($directory)) {
             return;
         }
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        foreach ($iterator as $file) {
-            $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
-        }
-
-        rmdir($directory);
+        File::deleteDirectory($directory);
     }
 }

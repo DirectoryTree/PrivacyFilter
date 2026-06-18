@@ -19,13 +19,21 @@ class FileDownloader
     ) {}
 
     /**
+     * Create a new file downloader instance.
+     */
+    public static function make(OutputInterface $output): self
+    {
+        return new self($output);
+    }
+
+    /**
      * Download a file to the given path.
      */
     public function download(string $url, string $target, string $label): void
     {
-        $expected = Http::head($url)->header('Content-Length');
+        $expected = $this->getDownloadSizeInBytes($url);
 
-        $progress = $this->makeProgressBar($expected, $label);
+        $progress = $this->newProgressBar($expected, $label);
 
         try {
             Http::timeout(0)->withOptions([
@@ -48,16 +56,13 @@ class FileDownloader
     /**
      * Create a progress bar for the download.
      */
-    protected function makeProgressBar(?int $expectedBytes, string $label): ProgressBar
+    protected function newProgressBar(int $expectedBytes, string $label): ProgressBar
     {
-        $progressBar = new ProgressBar($this->output, $expectedBytes ?? 0);
+        $progressBar = new ProgressBar($this->output, $expectedBytes);
 
         $label = 'Downloading '.$label.'...';
 
-        $progressBar->setFormat($expectedBytes
-            ? $label.' %current_bytes%/%max_bytes% [%bar%] %percent:3s%%'
-            : $label.' %current_bytes% downloaded'
-        );
+        $progressBar->setFormat($label.' %current_bytes%/%max_bytes% [%bar%] %percent:3s%%');
 
         $progressBar->setPlaceholderFormatterDefinition(
             'current_bytes',
@@ -72,5 +77,28 @@ class FileDownloader
         $progressBar->start();
 
         return $progressBar;
+    }
+
+    /**
+     * Get the expected download size.
+     */
+    protected function getDownloadSizeInBytes(string $url): int
+    {
+        try {
+            $response = Http::head($url)->throw();
+        } catch (Throwable $exception) {
+            throw new RuntimeException(
+                message: "Unable to determine download size for [{$url}]: {$exception->getMessage()}",
+                previous: $exception
+            );
+        }
+
+        $length = $response->header('Content-Length');
+
+        if (! is_numeric($length) || (int) $length <= 0) {
+            throw new RuntimeException("Unable to determine download size for [{$url}].");
+        }
+
+        return (int) $length;
     }
 }

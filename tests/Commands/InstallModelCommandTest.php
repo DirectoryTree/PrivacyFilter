@@ -6,11 +6,14 @@ use function Pest\Laravel\artisan;
 
 it('installs the configured model', function () {
     $model = $this->makePrivacyFilterModel();
+    $modelContents = file_get_contents($model);
     $target = $this->makeTemporaryDirectory().DIRECTORY_SEPARATOR.'models'.DIRECTORY_SEPARATOR.'privacy-filter.gguf';
     $url = 'https://example.com/privacy-filter.gguf';
 
     Http::fake([
-        $url => Http::response(file_get_contents($model)),
+        $url => Http::response($modelContents, headers: [
+            'Content-Length' => strlen($modelContents),
+        ]),
     ]);
 
     config()->set('privacy-filter.paths.model', $target);
@@ -30,11 +33,14 @@ it('installs the configured model', function () {
 
 it('does not overwrite an existing model unless forced', function () {
     $model = $this->makePrivacyFilterModel();
+    $modelContents = file_get_contents($model);
     $target = $this->makeTemporaryDirectory().DIRECTORY_SEPARATOR.'models'.DIRECTORY_SEPARATOR.'privacy-filter.gguf';
     $url = 'https://example.com/privacy-filter.gguf';
 
     Http::fake([
-        $url => Http::response(file_get_contents($model)),
+        $url => Http::response($modelContents, headers: [
+            'Content-Length' => strlen($modelContents),
+        ]),
     ]);
 
     mkdir(dirname($target), 0755, true);

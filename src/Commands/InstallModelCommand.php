@@ -3,6 +3,7 @@
 namespace DirectoryTree\PrivacyFilter\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use RuntimeException;
 
 /**
@@ -37,7 +38,7 @@ class InstallModelCommand extends Command
         $this->info('Installing privacy-filter model.');
         $this->line("Target: {$modelPath}");
 
-        if (file_exists($modelPath) && ! $this->option('force')) {
+        if (File::exists($modelPath) && ! $this->option('force')) {
             $this->warn('The privacy-filter model already exists. Use --force to overwrite it.');
 
             return self::SUCCESS;
@@ -63,16 +64,14 @@ class InstallModelCommand extends Command
     {
         $directory = dirname($target);
 
-        if (! is_dir($directory) && ! mkdir($directory, 0755, true) && ! is_dir($directory)) {
-            throw new RuntimeException("Unable to create model directory [{$directory}].");
-        }
+        File::ensureDirectoryExists($directory);
 
         $temporaryTarget = $target.'.tmp';
 
-        (new FileDownloader($this->output))->download($url, $temporaryTarget, 'model');
+        FileDownloader::make($this->output)->download($url, $temporaryTarget, 'model');
 
         if (! rename($temporaryTarget, $target)) {
-            @unlink($temporaryTarget);
+            File::delete($temporaryTarget);
 
             throw new RuntimeException("Unable to move model into [{$target}].");
         }
