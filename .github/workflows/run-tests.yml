@@ -1,61 +1,47 @@
-name: Tests
+name: Run Tests
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
-  tests:
-    name: PHP ${{ matrix.php }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  test:
+    runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        php:
-          - '8.2'
-          - '8.3'
-          - '8.4'
+        os: [ubuntu-latest]
+        php: [8.4, 8.3, 8.2]
+        include:
+          - php: 8.4
+            laravel: 13.*
+            testbench: 11.*
+
+          - php: 8.3
+            laravel: 12.*
+            testbench: 10.*
+
+          - php: 8.2
+            laravel: 11.*
+            testbench: 9.*
+
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.os }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: composer:v2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
 
-      - name: Validate Composer
-        run: composer validate --strict
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "directory=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v5.0.5
-        with:
-          path: ${{ steps.composer-cache.outputs.directory }}
-          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
-          restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php }}-composer-
-
       - name: Install dependencies
-        run: composer update --prefer-dist --no-interaction --no-progress
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction
 
-      - name: Run tests
-        run: ./vendor/bin/pest
+      - name: Execute tests
+        run: vendor/bin/pest --ci
