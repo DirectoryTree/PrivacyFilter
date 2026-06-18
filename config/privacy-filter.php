@@ -3,21 +3,6 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Binary Release
-    |--------------------------------------------------------------------------
-    |
-    | The Laravel package installs compiled privacy-filter.cpp binaries from
-    | the companion GitHub releases repository.
-    |
-    */
-
-    'release' => [
-        'repository' => env('PRIVACY_FILTER_BINARY_REPOSITORY', 'DirectoryTree/PrivacyFilterBinaries'),
-        'version' => env('PRIVACY_FILTER_BINARY_VERSION', 'v1.0.0'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Paths
     |--------------------------------------------------------------------------
     |
@@ -29,6 +14,20 @@ return [
     'paths' => [
         'binary' => env('PRIVACY_FILTER_BINARY_PATH', storage_path('app/privacy-filter/bin/privacy-filter')),
         'model' => env('PRIVACY_FILTER_MODEL_PATH', storage_path('app/privacy-filter/models/privacy-filter-f16.gguf')),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Process
+    |--------------------------------------------------------------------------
+    |
+    | The PHP API shells out to the local privacy-filter binary. This timeout
+    | protects requests and jobs from hanging indefinitely if the process stalls.
+    |
+    */
+
+    'process' => [
+        'timeout' => (float) env('PRIVACY_FILTER_TIMEOUT', 60),
     ],
 
     /*
@@ -47,21 +46,20 @@ return [
             'PRIVACY_FILTER_MODEL_URL',
             'https://huggingface.co/LocalAI-io/privacy-filter-GGUF/resolve/main/privacy-filter-f16.gguf',
         ),
-
-        'threshold' => (float) env('PRIVACY_FILTER_THRESHOLD', 0.5),
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Process
+    | Binary Release
     |--------------------------------------------------------------------------
     |
-    | The PHP API shells out to the local privacy-filter binary. This timeout
-    | protects requests and jobs from hanging indefinitely if the process stalls.
+    | The Laravel package installs compiled privacy-filter.cpp binaries from
+    | the companion GitHub releases repository.
     |
     */
 
-    'process' => [
-        'timeout' => (float) env('PRIVACY_FILTER_TIMEOUT', 60),
+    'release' => [
+        'repository' => env('PRIVACY_FILTER_BINARY_REPOSITORY', 'DirectoryTree/PrivacyFilterBinaries'),
+        'version' => env('PRIVACY_FILTER_BINARY_VERSION', 'v1.0.0'),
     ],
 ];

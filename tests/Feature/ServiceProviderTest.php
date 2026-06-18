@@ -10,7 +10,6 @@ it('merges the package configuration into the testbench application', function (
         ->and(config('privacy-filter.release.version'))->toBe('v1.0.0')
         ->and(config('privacy-filter.paths.binary'))->toBe(storage_path('app/privacy-filter/bin/privacy-filter'))
         ->and(config('privacy-filter.paths.model'))->toBe(storage_path('app/privacy-filter/models/privacy-filter-f16.gguf'))
-        ->and(config('privacy-filter.model.threshold'))->toBe(0.5)
         ->and(config('privacy-filter.process.timeout'))->toBe(60.0);
 });
 

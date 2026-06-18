@@ -23,7 +23,6 @@ class PrivacyFilterServiceProvider extends ServiceProvider
             return new Classifier(
                 binaryPath: config('privacy-filter.paths.binary'),
                 modelPath: config('privacy-filter.paths.model'),
-                threshold: config('privacy-filter.model.threshold'),
                 timeout: config('privacy-filter.process.timeout'),
             );
         });

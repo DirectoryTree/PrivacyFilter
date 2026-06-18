@@ -14,12 +14,16 @@ use Symfony\Component\Process\Process;
 class Classifier
 {
     /**
+     * The default classification threshold.
+     */
+    protected const DEFAULT_THRESHOLD = 0.5;
+
+    /**
      * Create a new privacy-filter API instance.
      */
     public function __construct(
         protected string $binaryPath,
         protected string $modelPath,
-        protected float $threshold,
         protected float $timeout,
     ) {}
 
@@ -37,7 +41,7 @@ class Classifier
             $this->binaryPath,
             '--classify',
             $this->modelPath,
-            (string) ($threshold ?? $this->threshold),
+            (string) ($threshold ?? self::DEFAULT_THRESHOLD),
         ]);
 
         $process->setInput($text);
