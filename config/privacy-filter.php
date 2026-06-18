@@ -3,11 +3,12 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Paths
+    | Privacy Filter Paths
     |--------------------------------------------------------------------------
     |
-    | These paths are used by the Artisan installers and, later, by the runtime
-    | PHP wrapper when invoking the local privacy-filter executable.
+    | Here you may configure the paths where the privacy-filter binary and
+    | model should be installed. These paths will be used by the installer
+    | commands and by the runtime classifier.
     |
     */
 
@@ -18,11 +19,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Process
+    | Process Timeout
     |--------------------------------------------------------------------------
     |
-    | The PHP API shells out to the local privacy-filter binary. This timeout
-    | protects requests and jobs from hanging indefinitely if the process stalls.
+    | The classifier runs the privacy-filter binary as a separate process. This
+    | value determines how many seconds the process may run before timing out.
     |
     */
 
@@ -32,12 +33,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Model
+    | Privacy Filter Model
     |--------------------------------------------------------------------------
     |
-    | LocalAI currently publishes one English GGUF and one multilingual GGUF for
-    | privacy-filter.cpp. The English F16 model is the smallest compatible file
-    | available for basic application use and CI smoke tests.
+    | This URL points to the GGUF model that should be downloaded by the model
+    | installer. You may change this value if you would like to use another
+    | compatible privacy-filter model.
     |
     */
 
@@ -50,11 +51,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Binary Release
+    | Binary Release Source
     |--------------------------------------------------------------------------
     |
-    | The Laravel package installs compiled privacy-filter.cpp binaries from
-    | the companion GitHub releases repository.
+    | The binary installer downloads compiled privacy-filter binaries from a
+    | GitHub release. You may customize the repository or release version
+    | used when installing the binary.
     |
     */
 
