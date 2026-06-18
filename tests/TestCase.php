@@ -5,6 +5,7 @@ namespace DirectoryTree\PrivacyFilter\Tests;
 use DirectoryTree\PrivacyFilter\Classifier;
 use DirectoryTree\PrivacyFilter\PrivacyFilterServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use PharData;
 
 /**
  * Base test case for package feature tests.
@@ -20,6 +21,13 @@ abstract class TestCase extends Orchestra
      * The fake GGUF model path used by tests.
      */
     protected string $fakePrivacyFilterModelPath;
+
+    /**
+     * Temporary paths that should be deleted after a test.
+     *
+     * @var array<int, string>
+     */
+    protected array $temporaryPaths = [];
 
     /**
      * Get package service providers.
@@ -86,6 +94,84 @@ abstract class TestCase extends Orchestra
     }
 
     /**
+     * Create a temporary directory for the current test.
+     */
+    protected function makeTemporaryDirectory(): string
+    {
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'privacy-filter-test-'.bin2hex(random_bytes(8));
+
+        mkdir($path, 0755, true);
+
+        $this->temporaryPaths[] = $path;
+
+        return $path;
+    }
+
+    /**
+     * Create a local privacy-filter binary archive for installer tests.
+     */
+    protected function makePrivacyFilterArchive(): string
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $root = $directory.DIRECTORY_SEPARATOR.'privacy-filter-test';
+        $bin = $root.DIRECTORY_SEPARATOR.'bin';
+        $binary = $bin.DIRECTORY_SEPARATOR.'privacy-filter';
+        $tar = $directory.DIRECTORY_SEPARATOR.'privacy-filter-test.tar';
+
+        mkdir($bin, 0755, true);
+        file_put_contents($binary, "#!/usr/bin/env sh\nprintf 'privacy-filter test binary'\n");
+        chmod($binary, 0755);
+
+        $archive = new PharData($tar);
+        $archive->buildFromDirectory($root);
+        $archive->compress(\Phar::GZ);
+
+        unlink($tar);
+
+        return $tar.'.gz';
+    }
+
+    /**
+     * Create a local GGUF model fixture for installer tests.
+     */
+    protected function makePrivacyFilterModel(): string
+    {
+        $directory = $this->makeTemporaryDirectory();
+        $path = $directory.DIRECTORY_SEPARATOR.'privacy-filter.gguf';
+
+        file_put_contents($path, 'privacy-filter test model');
+
+        return $path;
+    }
+
+    /**
+     * Delete a temporary file or directory.
+     */
+    protected function deleteTemporaryPath(string $path): void
+    {
+        if (is_file($path)) {
+            @unlink($path);
+
+            return;
+        }
+
+        if (! is_dir($path)) {
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+
+        foreach ($iterator as $file) {
+            $file->isDir() ? @rmdir($file->getPathname()) : @unlink($file->getPathname());
+        }
+
+        @rmdir($path);
+    }
+
+    /**
      * Clean up test resources.
      */
     protected function tearDown(): void
@@ -95,6 +181,10 @@ abstract class TestCase extends Orchestra
 
             if (isset($this->fakePrivacyFilterModelPath)) {
                 @unlink($this->fakePrivacyFilterModelPath);
+            }
+
+            foreach (array_reverse($this->temporaryPaths) as $path) {
+                $this->deleteTemporaryPath($path);
             }
         } finally {
             parent::tearDown();
