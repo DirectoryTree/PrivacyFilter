@@ -6,6 +6,7 @@ use DirectoryTree\PrivacyFilter\Commands\InstallBinaryCommand;
 use DirectoryTree\PrivacyFilter\Commands\InstallCommand;
 use DirectoryTree\PrivacyFilter\Commands\InstallModelCommand;
 use DirectoryTree\PrivacyFilterClassifier\Classifier;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -20,11 +21,11 @@ class PrivacyFilterServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/privacy-filter.php', 'privacy-filter');
 
-        $this->app->singleton(Classifier::class, function () {
+        $this->app->singleton(Classifier::class, function (Application $app) {
             return new Classifier(
-                binaryPath: config('privacy-filter.paths.binary'),
-                modelPath: config('privacy-filter.paths.model'),
-                timeout: config('privacy-filter.process.timeout'),
+                binaryPath: $app['config']->get('privacy-filter.paths.binary'),
+                modelPath: $app['config']->get('privacy-filter.paths.model'),
+                timeout: $app['config']->get('privacy-filter.process.timeout'),
             );
         });
     }
