@@ -32,6 +32,14 @@ readonly class Entity implements Arrayable, JsonSerializable
     }
 
     /**
+     * Get the known entity type.
+     */
+    public function type(): ?EntityType
+    {
+        return EntityType::tryFrom($this->type);
+    }
+
+    /**
      * Convert the entity to an array.
      *
      * @return array{type: string, start: int, end: int, score: float, text: string}
