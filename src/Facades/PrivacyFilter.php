@@ -2,13 +2,13 @@
 
 namespace DirectoryTree\PrivacyFilter\Facades;
 
-use DirectoryTree\PrivacyFilter\Classifier;
+use DirectoryTree\PrivacyFilterClassifier\Classifier;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static array<int, \DirectoryTree\PrivacyFilter\Entity> entities(string $text, ?float $threshold = null)
+ * @method static array<int, \DirectoryTree\PrivacyFilterClassifier\Entity> entities(string $text, ?float $threshold = null)
  *
- * @see \DirectoryTree\PrivacyFilter\Classifier
+ * @see \DirectoryTree\PrivacyFilterClassifier\Classifier
  */
 class PrivacyFilter extends Facade
 {

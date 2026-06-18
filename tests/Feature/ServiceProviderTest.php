@@ -1,6 +1,6 @@
 <?php
 
-use DirectoryTree\PrivacyFilter\Classifier;
+use DirectoryTree\PrivacyFilterClassifier\Classifier;
 use Illuminate\Support\Facades\Artisan;
 
 use function Pest\Laravel\artisan;

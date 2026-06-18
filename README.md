@@ -97,7 +97,7 @@ use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter;
 
 $entities = PrivacyFilter::entities('Contact John Doe at jdoe@example.com.');
 
-/** @var \DirectoryTree\PrivacyFilter\Entity $entity */
+/** @var \DirectoryTree\PrivacyFilterClassifier\Entity $entity */
 foreach ($entities as $entity) {
     $entity->type;  // private_email
     $entity->text;  // jdoe@example.com
@@ -135,7 +135,7 @@ $entity->type;
 For known privacy-filter entity types, you may retrieve the matching `EntityType` enum instance:
 
 ```php
-use DirectoryTree\PrivacyFilter\EntityType;
+use DirectoryTree\PrivacyFilterClassifier\EntityType;
 
 if ($entity->type() === EntityType::PrivateEmail) {
     // ...

@@ -5,6 +5,7 @@ namespace DirectoryTree\PrivacyFilter;
 use DirectoryTree\PrivacyFilter\Commands\InstallBinaryCommand;
 use DirectoryTree\PrivacyFilter\Commands\InstallCommand;
 use DirectoryTree\PrivacyFilter\Commands\InstallModelCommand;
+use DirectoryTree\PrivacyFilterClassifier\Classifier;
 use Illuminate\Support\ServiceProvider;
 
 /**

@@ -2,8 +2,8 @@
 
 namespace DirectoryTree\PrivacyFilter\Tests;
 
-use DirectoryTree\PrivacyFilter\Classifier;
 use DirectoryTree\PrivacyFilter\PrivacyFilterServiceProvider;
+use DirectoryTree\PrivacyFilterClassifier\Classifier;
 use Orchestra\Testbench\TestCase as Orchestra;
 use RuntimeException;
 use Symfony\Component\Process\Process;

@@ -1,10 +1,10 @@
 <?php
 
-use DirectoryTree\PrivacyFilter\Entity;
-use DirectoryTree\PrivacyFilter\Exceptions\BinaryNotFoundException;
-use DirectoryTree\PrivacyFilter\Exceptions\ModelNotFoundException;
 use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter as PrivacyFilterFacade;
-use DirectoryTree\PrivacyFilter\Classifier;
+use DirectoryTree\PrivacyFilterClassifier\Classifier;
+use DirectoryTree\PrivacyFilterClassifier\Entity;
+use DirectoryTree\PrivacyFilterClassifier\Exceptions\BinaryNotFoundException;
+use DirectoryTree\PrivacyFilterClassifier\Exceptions\ModelNotFoundException;
 
 beforeEach(function () {
     $this->useFakePrivacyFilter();

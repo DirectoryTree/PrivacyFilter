@@ -4,11 +4,11 @@
     "license": "MIT",
     "type": "library",
     "require": {
+        "directorytree/privacy-filter-classifier": "dev-master",
         "php": "^8.2",
         "illuminate/console": "^11.0|^12.0",
         "illuminate/http": "^11.0|^12.0",
-        "illuminate/support": "^11.0|^12.0",
-        "symfony/process": "^7.0"
+        "illuminate/support": "^11.0|^12.0"
     },
     "require-dev": {
         "orchestra/testbench": "^9.0|^10.0",
@@ -34,6 +34,12 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/DirectoryTree/PrivacyFilterClassifier"
+        }
+    ],
     "scripts": {
         "test": "pest"
     },
