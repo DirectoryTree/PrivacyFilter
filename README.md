@@ -3,12 +3,12 @@
 <p>
 <a href="https://github.com/DirectoryTree/PrivacyFilter/actions/workflows/run-tests.yml"><img src="https://github.com/DirectoryTree/PrivacyFilter/actions/workflows/run-tests.yml/badge.svg?branch=master" alt="Tests status"></a>
 </p>
-<p>Install and use compiled <a href="https://github.com/localai-org/privacy-filter.cpp"><code>privacy-filter.cpp</code></a> binaries from Laravel applications.</p>
+<p>Install and use compiled <a href="https://github.com/DirectoryTree/PrivacyFilterBinaries"><code>privacy-filter.cpp</code></a> binaries from Laravel applications.</p>
 </div>
 
 ## Introduction
 
-Privacy Filter provides a Laravel wrapper around the `privacy-filter.cpp` command line binary. It installs the compiled binary for the current operating system, downloads the GGUF model used by the binary, and exposes a small PHP API for detecting private entities in text.
+Privacy Filter provides a Laravel wrapper around the `privacy-filter.cpp` command line binary. It installs [the compiled binary](https://github.com/DirectoryTree/PrivacyFilterBinaries) for the current operating system, downloads the GGUF model used by the binary, and exposes a small PHP API for detecting private entities in text.
 
 ## Installation
 
