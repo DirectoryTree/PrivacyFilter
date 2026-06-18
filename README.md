@@ -115,7 +115,9 @@ $length = $entity->length();
 
 ## Thresholds
 
-The classifier uses a default threshold of `0.5`. You may provide a threshold at runtime when classifying text:
+The classifier uses a default threshold of `0.5`. The threshold is the minimum confidence score an entity must meet before it is returned. Increasing the threshold returns fewer, higher-confidence entities, while decreasing it may return more entities with lower confidence.
+
+You may provide a threshold at runtime when classifying text:
 
 ```php
 $entities = PrivacyFilter::entities(
