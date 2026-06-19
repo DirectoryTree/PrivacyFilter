@@ -123,16 +123,16 @@ use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter;
 
 $text = 'Contact John Doe at jdoe@example.com or 555-0100.';
 
+// Find personal information.
 $entities = PrivacyFilter::entities($text);
 
-$redacted = str($entities)->reduce(
-    fn ($text, $entity) => str_replace($entity->text, '[redacted]', $text),
-    $text,
-);
-
-echo $redacted;
+// Redact detected entities.
+$redacted = collect($entities)->reduce(function (string $text, $entity) {
+    return str_replace($entity->text, '[redacted]', $text);
+}, $text);
 
 // Contact [redacted] at [redacted] or [redacted].
+echo $redacted;
 ```
 
 ## Thresholds
