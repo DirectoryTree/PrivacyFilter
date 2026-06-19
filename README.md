@@ -173,8 +173,8 @@ If the binary returns an entity type that is not known by this package, the `typ
 You may use the `fake` method to prevent the package from invoking the installed binary during tests. The fake method accepts a list of entities that should be returned for every classification:
 
 ```php
-use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter;
 use DirectoryTree\PrivacyFilterClassifier\Entity;
+use DirectoryTree\PrivacyFilter\Facades\PrivacyFilter;
 
 PrivacyFilter::fake([
     new Entity(
