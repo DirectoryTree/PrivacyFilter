@@ -148,6 +148,35 @@ $entities = PrivacyFilter::entities(
 );
 ```
 
+## Queueing And Memory
+
+Privacy Filter runs the native `privacy-filter.cpp` binary when classifying text. The GGUF model is loaded into memory by the native process while classification is running. Larger models require more memory.
+
+For production workloads, you should avoid running many classifications concurrently from normal web requests. Instead, dispatch classification work to a dedicated queue and limit the number of workers assigned to that queue based on the memory available on your server.
+
+For example, if your selected model uses approximately 3 GB of memory while classifying, running four concurrent workers may require approximately 12 GB of memory, plus memory used by PHP, Redis, your database, and the rest of your application.
+
+A typical Horizon configuration may dedicate a small worker pool to privacy filtering:
+
+```php
+'privacy-filter' => [
+    'connection' => 'redis',
+    'queue' => ['privacy-filter'],
+    'balance' => 'simple',
+    'processes' => 2,
+    'tries' => 1,
+    'timeout' => 300,
+],
+```
+
+You may then dispatch redaction or classification work to the dedicated queue:
+
+```php
+RedactTranscript::dispatch($transcript)->onQueue('privacy-filter');
+```
+
+Tune the `processes` value according to your server memory and model size. Each concurrent classification may load its own copy of the model into memory.
+
 ## Entity Types
 
 The raw entity type is available through the entity's `type` property:
