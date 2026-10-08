@@ -1,13 +1,25 @@
-<div align="center">
-<h1>Privacy Filter</h1>
-<p>
-<a href="https://github.com/DirectoryTree/PrivacyFilter/actions"><img src="https://img.shields.io/github/actions/workflow/status/DirectoryTree/PrivacyFilter/run-tests.yml?branch=master&style=flat-square" alt="Tests status"></a>
-<a href="https://packagist.org/packages/directorytree/privacy-filter"><img src="https://img.shields.io/packagist/dt/directorytree/privacy-filter.svg?style=flat-square" alt="Total downloads"></a>
-<a href="https://packagist.org/packages/directorytree/privacy-filter"><img src="https://img.shields.io/packagist/v/directorytree/privacy-filter.svg?style=flat-square" alt="Latest version"></a>
-<a href="https://packagist.org/packages/directorytree/privacy-filter"><img src="https://img.shields.io/github/license/DirectoryTree/PrivacyFilter?style=flat-square" alt="License"></a>
+<h1 align="center">Privacy Filter</h1>
+
+<p align="center">Install and use compiled <a href="https://github.com/DirectoryTree/PrivacyFilterBinaries"><code>privacy-filter.cpp</code></a> binaries from Laravel applications.</p>
+
+<p align="center">
+    <a href="https://github.com/DirectoryTree/PrivacyFilter/actions/workflows/run-tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/DirectoryTree/PrivacyFilter/run-tests.yml?branch=master&amp;style=flat-square" alt="Tests"></a>
+    <a href="https://packagist.org/packages/directorytree/privacy-filter"><img src="https://img.shields.io/packagist/dt/directorytree/privacy-filter.svg?style=flat-square" alt="Total Downloads"></a>
+    <a href="https://packagist.org/packages/directorytree/privacy-filter"><img src="https://img.shields.io/packagist/v/directorytree/privacy-filter.svg?style=flat-square" alt="Latest Version"></a>
+    <a href="https://github.com/DirectoryTree/PrivacyFilter/blob/master/LICENSE"><img src="https://img.shields.io/github/license/DirectoryTree/PrivacyFilter?style=flat-square" alt="License"></a>
 </p>
-<p>Install and use compiled <a href="https://github.com/DirectoryTree/PrivacyFilterBinaries"><code>privacy-filter.cpp</code></a> binaries from Laravel applications.</p>
-</div>
+
+<p align="center">
+    <a href="#installation">Installation</a>
+    <span> · </span>
+    <a href="#configuration">Configuration</a>
+    <span> · </span>
+    <a href="#usage">Usage</a>
+    <span> · </span>
+    <a href="#testing">Testing</a>
+</p>
+
+---
 
 ## Introduction
 
